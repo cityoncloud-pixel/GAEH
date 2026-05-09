@@ -31,7 +31,8 @@ function Copy-TemplateItem {
 function Split-Adapters {
   param([string]$Value)
   if (-not $Value) { return @() }
-  return ($Value -split '[,;]' | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ })
+  # Support comma/semicolon/whitespace separated values (PowerShell may stringify arrays as "a b")
+  return ($Value -split '[,;\s]+' | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ })
 }
 
 function Install-AdapterCodex {
