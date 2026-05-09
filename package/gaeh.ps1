@@ -97,8 +97,17 @@ if (-not (Test-Path -LiteralPath $kit)) { throw "GAEH kit path not found: $kit" 
   $shimPath = Join-Path (Join-Path $gaehHome 'bin') 'gaeh.ps1'
   Set-Content -LiteralPath $shimPath -Value $shim -Encoding UTF8
 
+  # Create CMD shim for shorter command name: `gaeh`
+  $cmdShim = @'
+@echo off
+powershell -NoProfile -ExecutionPolicy Bypass -File "%USERPROFILE%\.gaeh\bin\gaeh.ps1" %*
+'@
+  $cmdShimPath = Join-Path (Join-Path $gaehHome 'bin') 'gaeh.cmd'
+  Set-Content -LiteralPath $cmdShimPath -Value $cmdShim -Encoding ASCII
+
   Write-Host "GAEH installed to: $dstKit"
   Write-Host "Shim created: $shimPath"
+  Write-Host "CMD shim created: $cmdShimPath"
   Write-Host "Add to PATH (current session):"
   $binPath = (Join-Path $gaehHome 'bin')
   Write-Host ("  `$env:PATH = `"{0};$env:PATH`"" -f $binPath)
