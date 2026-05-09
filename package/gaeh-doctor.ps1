@@ -74,4 +74,23 @@ if (Test-Path -LiteralPath $codexSkill) { Ok "Codex adapter present" } else { Wr
 $cursorRule = Join-Path $TargetPath '.cursor\rules\gaeh.mdc'
 if (Test-Path -LiteralPath $cursorRule) { Ok "Cursor adapter present" } else { Write-Host "GAEH doctor: WARN - Cursor adapter not found (.cursor/rules/gaeh.mdc)" -ForegroundColor Yellow }
 
+## Optional Git checks (professional workflow)
+$git = Get-Command git -ErrorAction SilentlyContinue
+if (-not $git) {
+  Write-Host "GAEH doctor: WARN - git not found in PATH (Git discipline features will be limited)" -ForegroundColor Yellow
+} else {
+  $gitDir = Join-Path $TargetPath '.git'
+  if (Test-Path -LiteralPath $gitDir) {
+    Ok "Git repo present"
+    try {
+      $origin = & git -C $TargetPath remote get-url origin 2>$null
+      if ($origin) { Ok "Git remote 'origin' configured" } else { Write-Host "GAEH doctor: WARN - Git remote 'origin' missing" -ForegroundColor Yellow }
+    } catch {
+      Write-Host "GAEH doctor: WARN - Cannot read git remote 'origin'" -ForegroundColor Yellow
+    }
+  } else {
+    Write-Host "GAEH doctor: WARN - .git not found (run: git init && git remote add origin <url>)" -ForegroundColor Yellow
+  }
+}
+
 Write-Host "GAEH doctor: PASS" -ForegroundColor Green

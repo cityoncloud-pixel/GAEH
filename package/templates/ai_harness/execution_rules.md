@@ -17,3 +17,17 @@
 - Risks / Follow-ups
 - Next task suggestion
 
+## Git Discipline (Professional Default)
+After Owner approval, AI should treat git as part of the delivery pipeline:
+- Preconditions:
+  - The project must be a git repo (`.git/` exists)
+  - `origin` remote must exist and be pushable
+- Workflow per subtask:
+  1) Implement changes
+  2) Run minimal verification (commands or manual steps) and record in `reports/*.report.md`
+  3) `git status` must be understood (no surprise files)
+  4) `git add -A`
+  5) `git commit -m "<type>(<scope>): <summary>"`
+  6) `git push origin <current-branch>`
+- If any precondition fails (no git / no origin / auth issue), stop and ask Owner.
+
