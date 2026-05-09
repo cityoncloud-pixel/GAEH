@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "YYYY-MM-DD",
+  "policy": {
+    "require_owner_approval_before_execute": true,
+    "allow_chat_approval_token": true,
+    "chat_approval_token": "APPROVE"
+  },
+  "pending": [
+    {
+      "id": "init-approval",
+      "scope": "start_execution",
+      "task_id": null,
+      "summary": "Approve AI to execute the current goal end-to-end (until completion) within defined scope.",
+      "status": "PENDING",
+      "owner_note": ""
+    }
+  ],
+  "history": []
+}
+

@@ -1,0 +1,6 @@
+_tmp_install_test*
+gaeh_install.log
+*.zip
+*.tmp
+*.log
+
