@@ -116,14 +116,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%USERPROFILE%\.gaeh\bin\gae
 function Cmd-Init {
   param(
     [string]$TargetPath = (Get-Location).Path,
-    [string]$Adapters = $null,
+    [string[]]$Adapters = $null,
     [switch]$Force
   )
 
-  if (-not $Adapters) {
+  if (-not $Adapters -or $Adapters.Count -eq 0) {
     $cfg = Read-Json (Join-Path (Get-GaehHome) 'config.json')
     if ($cfg -and $cfg.default_adapters) {
-      $Adapters = (($cfg.default_adapters | ForEach-Object { $_.ToString() }) -join ',')
+      $Adapters = @($cfg.default_adapters | ForEach-Object { $_.ToString() })
     }
   }
 
@@ -132,7 +132,7 @@ function Cmd-Init {
   if (-not (Test-Path -LiteralPath $bootstrap)) { throw "Missing bootstrap: $bootstrap" }
 
   $cmd = @('-ExecutionPolicy','Bypass','-File',$bootstrap,'-TargetPath',$TargetPath)
-  if ($Adapters) { $cmd += @('-Adapters',$Adapters) }
+  if ($Adapters -and $Adapters.Count -gt 0) { $cmd += @('-Adapters',($Adapters -join ',')) }
   if ($Force) { $cmd += @('-Force') }
   & powershell @cmd
 }
@@ -244,12 +244,26 @@ switch ($cmd) {
   'install' { Cmd-Install; break }
   'init' {
     $tp = (Get-Location).Path
-    $ad = $null
+    $ad = @()
     $force = $false
     for ($i=0; $i -lt $rest.Count; $i++) {
       $a = $rest[$i]
       if ($a -eq '-TargetPath' -and $i+1 -lt $rest.Count) { $tp = $rest[$i+1]; $i++; continue }
-      if ($a -eq '-Adapters' -and $i+1 -lt $rest.Count) { $ad = $rest[$i+1]; $i++; continue }
+      if ($a -eq '-Adapters' -and $i+1 -lt $rest.Count) {
+        # Support: -Adapters "codex,cursor"  OR  -Adapters codex,cursor  OR  -Adapters codex cursor
+        $v = $rest[$i+1]
+        $i++
+        if ($v -match '[,;]') {
+          $ad += @($v)
+        } else {
+          $ad += @($v)
+          while ($i+1 -lt $rest.Count -and -not ($rest[$i+1] -like '-*')) {
+            $ad += @($rest[$i+1])
+            $i++
+          }
+        }
+        continue
+      }
       if ($a -eq '-Force') { $force = $true; continue }
     }
     if ($force) { Cmd-Init -TargetPath $tp -Adapters $ad -Force } else { Cmd-Init -TargetPath $tp -Adapters $ad }
