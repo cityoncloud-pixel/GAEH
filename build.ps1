@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory = $false)]
-  [string]$OutDir = (Join-Path $PSScriptRoot 'dist'),
+  [string]$OutDir = '',
 
   [Parameter(Mandatory = $false)]
   [switch]$Clean
@@ -14,7 +14,14 @@ function Ensure-Dir([string]$Path) {
   }
 }
 
-$kitRoot = Join-Path $PSScriptRoot 'package'
+$root = $PSScriptRoot
+if (-not $root) { $root = (Get-Location).Path }
+
+if (-not $OutDir) {
+  $OutDir = Join-Path $root 'dist'
+}
+
+$kitRoot = Join-Path $root 'package'
 $metaPath = Join-Path $kitRoot 'gaeh-kit.json'
 if (-not (Test-Path -LiteralPath $metaPath)) { throw "Missing kit metadata: $metaPath" }
 
@@ -39,4 +46,3 @@ Write-Host "Building: $zipPath"
 Compress-Archive -Path (Join-Path $kitRoot '*') -DestinationPath $zipPath -CompressionLevel Optimal
 Write-Host "Done."
 Write-Host "Next: create a GitHub Release and upload: $zipName"
-
