@@ -56,7 +56,12 @@ $payload = @{
 try {
   $release = Invoke-RestMethod -Headers $headers -Uri "$apiBase/releases" -Method Post -Body $payload -ContentType 'application/json'
 } catch {
-  Fail "Create release failed. Error: $($_.Exception.Message)"
+  Info "Create release failed (may already exist). Trying to fetch by tag: $Tag"
+  try {
+    $release = Invoke-RestMethod -Headers $headers -Uri "$apiBase/releases/tags/$Tag" -Method Get
+  } catch {
+    Fail "Create release failed and cannot fetch existing release by tag. Error: $($_.Exception.Message)"
+  }
 }
 
 if (-not $release.upload_url) { Fail "Missing upload_url in response." }
@@ -74,4 +79,3 @@ try {
 }
 
 Info "Done. Release created: $($release.html_url)"
-
