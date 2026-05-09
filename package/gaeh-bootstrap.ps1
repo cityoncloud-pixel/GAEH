@@ -165,4 +165,4 @@ $log += "adapters: $($selectedAdapters -join ',')"
 Set-Content -LiteralPath $logPath -Value ($log -join [Environment]::NewLine) -Encoding UTF8
 
 Write-Host "Done."
-Write-Host "Next: fill project_control\\goal.md, then ask your AI: 按 GAEH 流程开始执行当前 goal"
+Write-Host "Next: fill project_control\\goal.md, then tell your AI: 'Start following GAEH workflow using project_control/goal.md until you have a verified result and a report.'"
