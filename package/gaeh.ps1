@@ -64,9 +64,24 @@ function Cmd-Install {
   if (-not $version) { throw "Missing version in gaeh-kit.json" }
 
   $dstKit = Join-Path (Join-Path $gaehHome 'kits') $version
-  if (Test-Path -LiteralPath $dstKit) { Remove-Item -Recurse -Force -LiteralPath $dstKit }
-  Ensure-Dir $dstKit
-  Copy-Item -Recurse -Force -Path (Join-Path $kitRoot '*') -Destination $dstKit
+  $srcResolved = $null
+  $dstResolved = $null
+  try { $srcResolved = (Resolve-Path -LiteralPath $kitRoot).Path } catch { }
+  try { $dstResolved = (Resolve-Path -LiteralPath $dstKit).Path } catch { }
+
+  $samePath = $false
+  if ($srcResolved -and $dstResolved -and ($srcResolved.TrimEnd('\\') -ieq $dstResolved.TrimEnd('\\'))) {
+    $samePath = $true
+  }
+
+  if (-not $samePath) {
+    if (Test-Path -LiteralPath $dstKit) { Remove-Item -Recurse -Force -LiteralPath $dstKit }
+    Ensure-Dir $dstKit
+
+    $srcGaeh = Join-Path $kitRoot 'gaeh.ps1'
+    if (-not (Test-Path -LiteralPath $srcGaeh)) { throw "Invalid kit root (missing gaeh.ps1): $kitRoot" }
+    Copy-Item -Recurse -Force -Path (Join-Path $kitRoot '*') -Destination $dstKit
+  }
 
   # Update "current" pointer
   $currentPath = Join-Path $gaehHome 'current.txt'
