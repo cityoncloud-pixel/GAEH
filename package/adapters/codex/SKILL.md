@@ -14,10 +14,15 @@ GAEH 是一套“目标驱动的工程协作协议 + 目录骨架 + 状态文件
 - `project_control/task_queue.json`
 - `project_control/decision_log.md`
 - `project_control/approval.json`
+- `project_control/agent_heartbeat.json`
 - `project_control/change_requests.md`
 - `project_control/issues.md`
 - `ai_harness/harness_rules.md`
 - `plans/` `reviews/` `reports/` `specs/`
+
+## Heartbeat (Anti-drift)
+- 每个 major step（spec/plan/review/execute/verify/report）更新 `project_control/agent_heartbeat.json`
+- `status` 推荐值：`IDLE` / `RUNNING` / `WAITING_OWNER` / `STUCK` / `DONE`
 
 ## Consent Gate (Must)
 在开始“连续执行直到完成目标”前，必须先获得 Owner 明确同意：

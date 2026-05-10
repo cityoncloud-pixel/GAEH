@@ -62,6 +62,7 @@ function Validate-Install {
   $requiredFiles = @(
     'project_control\goal.md',
     'project_control\phase_status.md',
+    'project_control\agent_heartbeat.json',
     'project_control\task_queue.json',
     'project_control\decision_log.md',
     'project_control\approval.json',
@@ -141,6 +142,17 @@ if (Test-Path -LiteralPath $approvalPath) {
   if ($txt -match '"updated_at"\s*:\s*"YYYY-MM-DD"') {
     $txt = $txt -replace '"updated_at"\s*:\s*"YYYY-MM-DD"', ('"updated_at": "' + $today + '"')
     Set-Content -LiteralPath $approvalPath -Value $txt -Encoding UTF8
+  }
+}
+
+# Patch placeholder date in agent_heartbeat.json
+$hbPath = Join-Path $TargetPath 'project_control\agent_heartbeat.json'
+if (Test-Path -LiteralPath $hbPath) {
+  $txt = Get-Content -Raw -LiteralPath $hbPath
+  $today = (Get-Date).ToString('yyyy-MM-dd')
+  if ($txt -match '"updated_at"\s*:\s*"YYYY-MM-DD"') {
+    $txt = $txt -replace '"updated_at"\s*:\s*"YYYY-MM-DD"', ('"updated_at": "' + $today + '"')
+    Set-Content -LiteralPath $hbPath -Value $txt -Encoding UTF8
   }
 }
 

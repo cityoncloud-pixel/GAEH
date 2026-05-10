@@ -12,10 +12,15 @@
 - `project_control/task_queue.json`
 - `project_control/decision_log.md`
 - `project_control/approval.json`
+- `project_control/agent_heartbeat.json`
 - `project_control/change_requests.md`
 - `project_control/issues.md`
 - `ai_harness/harness_rules.md`
 - `plans/` `reviews/` `reports/` `specs/`
+
+## Heartbeat (Anti-drift)
+- 每个 major step（spec/plan/review/execute/verify/report）更新 `project_control/agent_heartbeat.json`
+- `status` 推荐值：`IDLE` / `RUNNING` / `WAITING_OWNER` / `STUCK` / `DONE`
 
 ## Consent Gate
 开始“持续执行直到目标完成”前，必须先获得 Owner 明确同意：

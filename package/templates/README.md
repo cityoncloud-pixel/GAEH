@@ -15,6 +15,15 @@
 - 对话中回复：`APPROVE`
 - 或修改：`project_control/approval.json` / 使用 `gaeh approve`
 
+## Anti-drift Watchdog (Optional)
+If you worry Codex/Cursor may drift or stop mid-run:
+- One-shot check: `gaeh watchdog -Once -StaleMinutes 20`
+- Continuous monitor: `gaeh watchdog -StaleMinutes 20 -IntervalSeconds 60`
+
+If it detects “tasks remain but no recent activity”, it writes:
+- `project_control/recovery_prompt.md` (paste this back to the AI to resume)
+- updates `project_control/agent_heartbeat.json` to `STUCK`
+
 ## Governance
 - Tiny Fix 允许不写 spec/plan，但必须：最小验证 + report + decision_log + task_queue 同步。
 - 发现问题（已完成但不对）：把复现写到 `project_control/issues.md`，AI 先给“可能原因 + 证据收集计划”，定位根因后修复并回归验证。

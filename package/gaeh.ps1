@@ -42,6 +42,7 @@ Usage:
   .\gaeh.ps1 doctor  [-TargetPath <path>]
   .\gaeh.ps1 ggs     [-TargetPath <path>]
   .\gaeh.ps1 start
+  .\gaeh.ps1 watchdog [-TargetPath <path>] [-StaleMinutes <n>] [-IntervalSeconds <n>] [-Once]
   .\gaeh.ps1 approve [-TargetPath <path>] [-Scope start_execution] [-TaskId <id>] [-Note <text>]
 
 Tip:
@@ -177,6 +178,23 @@ function Cmd-Start {
   Write-Host "Start GAEH: clarify goal (boundary + UI) -> propose minimal questions -> wait for owner token 'APPROVE' -> execute end-to-end until acceptance; persist to plans/reviews/reports and project_control/*.md."
 }
 
+function Cmd-Watchdog {
+  param(
+    [string]$TargetPath = (Get-Location).Path,
+    [int]$StaleMinutes = 20,
+    [int]$IntervalSeconds = 60,
+    [switch]$Once
+  )
+
+  $kitRoot = Get-KitRoot
+  $script = Join-Path $kitRoot 'gaeh-watchdog.ps1'
+  if (-not (Test-Path -LiteralPath $script)) { throw "Missing watchdog script: $script" }
+
+  $cmd = @('-ExecutionPolicy','Bypass','-File',$script,'-TargetPath',$TargetPath,'-StaleMinutes',$StaleMinutes,'-IntervalSeconds',$IntervalSeconds)
+  if ($Once) { $cmd += @('-Once') }
+  & powershell @cmd
+}
+
 function Cmd-Approve {
   param(
     [string]$TargetPath = (Get-Location).Path,
@@ -303,6 +321,21 @@ switch ($cmd) {
     break
   }
   'start' { Cmd-Start; break }
+  'watchdog' {
+    $tp = (Get-Location).Path
+    $stale = 20
+    $interval = 60
+    $once = $false
+    for ($i=0; $i -lt $rest.Count; $i++) {
+      $a = $rest[$i]
+      if ($a -eq '-TargetPath' -and $i+1 -lt $rest.Count) { $tp = $rest[$i+1]; $i++; continue }
+      if ($a -eq '-StaleMinutes' -and $i+1 -lt $rest.Count) { $stale = [int]$rest[$i+1]; $i++; continue }
+      if ($a -eq '-IntervalSeconds' -and $i+1 -lt $rest.Count) { $interval = [int]$rest[$i+1]; $i++; continue }
+      if ($a -eq '-Once') { $once = $true; continue }
+    }
+    Cmd-Watchdog -TargetPath $tp -StaleMinutes $stale -IntervalSeconds $interval -Once:([bool]$once)
+    break
+  }
   'approve' {
     $tp = (Get-Location).Path
     $scope = 'start_execution'

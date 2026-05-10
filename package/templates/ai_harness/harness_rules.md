@@ -16,6 +16,7 @@
 - Queue: `project_control/task_queue.json`
 - Decisions: `project_control/decision_log.md`
 - Owner approvals: `project_control/approval.json`
+- Agent heartbeat: `project_control/agent_heartbeat.json`
 - Change requests: `project_control/change_requests.md`
 - Issues / bug reports: `project_control/issues.md`
 - Specs: `specs/*.spec.md`
@@ -51,4 +52,10 @@ If Owner reports issues (or updates `project_control/issues.md`):
 - Produce a hypothesis list (most likely first) + evidence to collect.
 - Identify the root cause, document it in `reports/*.report.md`, and fix it.
 - Add regression verification steps and re-run minimal checks.
+
+## 7) Heartbeat / Anti-Drift (Required)
+To reduce “agent drift / silent stop”, AI must keep a simple heartbeat:
+- Update `project_control/agent_heartbeat.json` at least once per major step (spec/plan/review/execute/verify/report).
+- Set `status` to one of: IDLE / RUNNING / WAITING_OWNER / STUCK / DONE.
+- Record `active_task_id` and `active_step` so an external watchdog can resume deterministically.
 

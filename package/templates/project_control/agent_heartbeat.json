@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "YYYY-MM-DD",
+  "updated_ts": null,
+  "status": "IDLE",
+  "active_task_id": null,
+  "active_step": null,
+  "last_artifact": null,
+  "note": ""
+}
+

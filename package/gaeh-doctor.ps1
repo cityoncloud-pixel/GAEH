@@ -28,6 +28,7 @@ Ok "Directories present"
 $requiredFiles = @(
   'project_control\goal.md',
   'project_control\phase_status.md',
+  'project_control\agent_heartbeat.json',
   'project_control\task_queue.json',
   'project_control\decision_log.md',
   'project_control\approval.json',
@@ -65,6 +66,15 @@ try {
   Ok "approval.json is valid JSON"
 } catch {
   Fail "approval.json invalid JSON: $($_.Exception.Message)"
+}
+
+# agent_heartbeat.json must be valid JSON
+$hbPath = Join-Path $TargetPath 'project_control\agent_heartbeat.json'
+try {
+  $null = (Get-Content -Raw -LiteralPath $hbPath) | ConvertFrom-Json
+  Ok "agent_heartbeat.json is valid JSON"
+} catch {
+  Fail "agent_heartbeat.json invalid JSON: $($_.Exception.Message)"
 }
 
 # Optional adapters check
